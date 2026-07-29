@@ -1,8 +1,17 @@
+# Dependencies & Build Output
 node_modules
 .next
 out
-.env.local
-.DS_Store
 *.tsbuildinfo
 next-env.d.ts
+
+# Environment Files (Keep secrets local & out of version control)
+.env
+.env.local
+.env*.local
+.env.production
+.env.development
+
+# Miscellaneous
+.DS_Store
 .claude/
