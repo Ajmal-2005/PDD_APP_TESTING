@@ -16,12 +16,12 @@ interface AppCtx {
   firebaseReady: boolean;
   loginAsGuest: (name?: string, email?: string) => void;
   logoutGuest: () => void;
+  logoutApp: () => Promise<void>;
 }
 
 const Ctx = createContext<AppCtx | null>(null);
 
 export function AppProvider({ children }: { children: ReactNode }) {
-  // Mirrors ThemeDataStore + LocaleHelper on Android, backed by localStorage here.
   const [dark, setDark] = useState(true);
   const [locale, setLocaleState] = useState<Locale>('en');
   const [user, setUser] = useState<User | null>(null);
@@ -68,6 +68,18 @@ export function AppProvider({ children }: { children: ReactNode }) {
         if (u) {
           setUser(u);
           localStorage.removeItem('agrovision.demoUser');
+        } else {
+          const demoUserStr = typeof window !== 'undefined' ? localStorage.getItem('agrovision.demoUser') : null;
+          if (demoUserStr) {
+            try {
+              setUser(JSON.parse(demoUserStr));
+            } catch {
+              localStorage.removeItem('agrovision.demoUser');
+              setUser(null);
+            }
+          } else {
+            setUser(null);
+          }
         }
         setAuthLoading(false);
       });
@@ -93,6 +105,16 @@ export function AppProvider({ children }: { children: ReactNode }) {
     setUser(null);
   }, []);
 
+  const logoutApp = useCallback(async () => {
+    localStorage.removeItem('agrovision.demoUser');
+    setUser(null);
+    const auth = await getAuthInstance();
+    if (auth) {
+      const { signOut } = await import('firebase/auth');
+      await signOut(auth).catch((e) => console.warn('Signout error', e));
+    }
+  }, []);
+
   const t = useCallback(
     (key: StringKey, ...args: (string | number)[]) => {
       const s = dictionaries[locale][key] ?? dictionaries.en[key] ?? String(key);
@@ -113,8 +135,9 @@ export function AppProvider({ children }: { children: ReactNode }) {
       firebaseReady,
       loginAsGuest,
       logoutGuest,
+      logoutApp,
     }),
-    [dark, locale, t, user, authLoading, loginAsGuest, logoutGuest],
+    [dark, locale, t, user, authLoading, loginAsGuest, logoutGuest, logoutApp],
   );
 
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>;

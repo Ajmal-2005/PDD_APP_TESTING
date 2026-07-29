@@ -50,6 +50,6 @@ export const logout = async () => {
   const a = await getAuthInstance();
   if (a) {
     const { signOut } = await import('firebase/auth');
-    await signOut(a);
+    await signOut(a).catch((e) => console.warn('SignOut error', e));
   }
 };

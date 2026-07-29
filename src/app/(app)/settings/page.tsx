@@ -171,7 +171,7 @@ function DataSection() {
 }
 
 function AboutSection() {
-  const { t } = useApp();
+  const { t, logoutApp } = useApp();
   const router = useRouter();
   return (
     <>
@@ -199,7 +199,7 @@ function AboutSection() {
       <Panel>
         <PanelBody>
           <Button variant="ghost" icon={<LogOut size={16} />} className="text-risk-high hover:bg-risk-high/10"
-            onClick={async () => { await logout(); router.replace('/login'); }}>
+            onClick={async () => { await logoutApp(); router.replace('/login'); }}>
             {t('logout')}
           </Button>
         </PanelBody>

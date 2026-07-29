@@ -15,7 +15,7 @@ import { cx, formatDate } from '@/lib/utils';
 import { useLabels } from '@/lib/labels';
 
 export function Topbar({ onOpenMobileNav, onOpenSearch }: { onOpenMobileNav: () => void; onOpenSearch: () => void }) {
-  const { t, dark, toggleDark, locale, setLocale, user } = useApp();
+  const { t, dark, toggleDark, locale, setLocale, user, logoutApp } = useApp();
   const { diseaseName } = useLabels();
   const path = usePathname();
   const router = useRouter();
@@ -199,7 +199,7 @@ export function Topbar({ onOpenMobileNav, onOpenSearch }: { onOpenMobileNav: () 
               <MenuItem
                 icon={<LogOut size={15} />}
                 danger
-                onClick={async () => { close(); await logout(); router.replace('/login'); }}
+                onClick={async () => { close(); await logoutApp(); router.replace('/login'); }}
               >
                 {t('logout')}
               </MenuItem>

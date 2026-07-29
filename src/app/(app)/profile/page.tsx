@@ -17,7 +17,7 @@ import { scanStreak } from '@/lib/utils';
 import { LOCALE_NAMES } from '@/lib/i18n';
 
 export default function ProfilePage() {
-  const { t, user, locale } = useApp();
+  const { t, user, locale, logoutApp } = useApp();
   const router = useRouter();
   const scans = useScans();
   const [farm, saveFarm] = useFarmDetails();
@@ -171,7 +171,7 @@ export default function ProfilePage() {
 
         <div className="col-span-12">
           <Button variant="ghost" icon={<LogOut size={16} />} className="text-risk-high hover:bg-risk-high/10"
-            onClick={async () => { await logout(); router.replace('/login'); }}>
+            onClick={async () => { await logoutApp(); router.replace('/login'); }}>
             {t('logout')}
           </Button>
         </div>
