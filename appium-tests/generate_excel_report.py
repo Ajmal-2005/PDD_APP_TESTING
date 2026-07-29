@@ -312,7 +312,8 @@ def create_excel_report():
     ws_det.column_dimensions["H"].width = 38
     ws_det.column_dimensions["I"].width = 38
 
-    output_file = "AgroVision_Appium_E2E_Test_Report.xlsx"
+    output_dir = os.path.dirname(os.path.abspath(__file__))
+    output_file = os.path.join(output_dir, "AgroVision_Appium_E2E_Test_Report.xlsx")
     wb.save(output_file)
     print(f"Successfully generated 100% Passed Appium report: {output_file} ({len(test_cases)} test cases)")
 
