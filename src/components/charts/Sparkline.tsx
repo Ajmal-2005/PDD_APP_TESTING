@@ -1,6 +1,6 @@
 import { cx } from '@/lib/utils';
 
-/** 12-ish point trend line. No axes, no labels — it rides beside a stat value. */
+/** 12-ish point trend line. No axes, no labels - it rides beside a stat value. */
 export function Sparkline({ values, color = 'rgb(var(--brand))', className }: {
   values: number[]; color?: string; className?: string;
 }) {

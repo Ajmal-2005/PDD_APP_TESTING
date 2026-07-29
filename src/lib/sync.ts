@@ -3,7 +3,7 @@ import { db as localDb, isCompleteScan, normalizeScan, type Scan } from './db';
 
 /**
  * Connectivity probes written by firestore-diagnostic.js. They are deliberately
- * partial documents, and the listener sees them before the script deletes them —
+ * partial documents, and the listener sees them before the script deletes them -
  * they are not scans and must never reach history.
  */
 const isDiagnostic = (id: string) => id.startsWith('__diagnostic__');
@@ -22,22 +22,68 @@ const isDiagnostic = (id: string) => id.startsWith('__diagnostic__');
 function explain(e: unknown): string {
   const code = (e as { code?: string })?.code ?? '';
   if (code.includes('permission-denied')) {
-    return 'permission-denied — publish Firestore security rules allowing ' +
+    return 'permission-denied - publish Firestore security rules allowing ' +
       'users/{uid}/scans for the signed-in user.';
   }
   if (code.includes('unavailable') || code.includes('not-found')) {
-    return 'database unreachable — create the Cloud Firestore database in the Firebase console.';
+    return 'database unreachable - create the Cloud Firestore database in the Firebase console.';
   }
   if (code.includes('failed-precondition')) {
-    return 'failed-precondition — Cloud Firestore may not be enabled for this project.';
+    return 'failed-precondition - Cloud Firestore may not be enabled for this project.';
   }
   return (e as Error)?.message ?? String(e);
+}
+
+/** Longest edge of the synced thumbnail, and the JPEG quality used for it. */
+const THUMB_DIM = 480;
+const THUMB_QUALITY = 0.7;
+/**
+ * Hard ceiling on the encoded thumbnail. Firestore rejects any document over 1 MB, and a
+ * rejected write loses the whole diagnosis, not just the picture - so the image is dropped
+ * long before it can threaten the document.
+ */
+const THUMB_MAX_BYTES = 200_000;
+
+/**
+ * Shrinks a scan image to a thumbnail small enough to live inside its Firestore document.
+ *
+ * This is how pictures cross between devices without Cloud Storage, which Firebase now
+ * gates behind the paid Blaze plan. Roughly 20-50 KB at 480px, against a 1 MB document
+ * limit; the full-resolution copy never leaves the device that took it.
+ *
+ * Returns '' if anything fails - the diagnosis must sync regardless.
+ */
+async function makeThumb(dataUrl: string): Promise<string> {
+  if (!dataUrl) return '';
+  try {
+    const img = new Image();
+    img.src = dataUrl;
+    await img.decode();
+
+    const scale = Math.min(1, THUMB_DIM / Math.max(img.naturalWidth, img.naturalHeight));
+    const canvas = document.createElement('canvas');
+    canvas.width = Math.max(1, Math.round(img.naturalWidth * scale));
+    canvas.height = Math.max(1, Math.round(img.naturalHeight * scale));
+    canvas.getContext('2d')!.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+    let thumb = canvas.toDataURL('image/jpeg', THUMB_QUALITY);
+    // One retry at lower quality before giving up, so an unusually busy photo still syncs.
+    if (thumb.length > THUMB_MAX_BYTES) thumb = canvas.toDataURL('image/jpeg', 0.45);
+    if (thumb.length > THUMB_MAX_BYTES) {
+      console.warn('[AgroVision sync] Thumbnail too large to embed, syncing without image');
+      return '';
+    }
+    return thumb;
+  } catch (e) {
+    console.warn('[AgroVision sync] Could not build thumbnail:', e);
+    return '';
+  }
 }
 
 /**
  * Uploads a scan's picture to scan-images/{uid}/{scanId}.jpg and returns its download URL.
  *
- * Mirrors ScanRepository.uploadImage on Android — same bucket path, so a scan taken on
+ * Mirrors ScanRepository.uploadImage on Android - same bucket path, so a scan taken on
  * either platform resolves to the same object and both can display it.
  *
  * Returns '' on any failure. Callers must not let this abort the Firestore write: losing
@@ -68,25 +114,53 @@ export async function syncScan(scan: Scan): Promise<void> {
   const db = await getDb();
   if (!auth?.currentUser || !db) return;
   const uid = auth.currentUser.uid;
+  const { doc, setDoc, updateDoc } = await import('firebase/firestore');
+  const ref = doc(db, 'users', uid, 'scans', scan.id);
+
+  /*
+   * The diagnosis goes first, on its own.
+   *
+   * This used to await the image upload before writing anything. When Firebase Storage is
+   * not enabled the SDK retries for up to maxUploadRetryTime (10 minutes by default), so
+   * the write sat behind a stalled upload - and because callers invoke this as
+   * `void syncScan(...)`, closing the tab in the meantime meant the scan never reached
+   * Firestore and never appeared on the phone.
+   *
+   * Ordering it this way costs nothing: a document that briefly has no imageUrl is exactly
+   * what a scan taken before image sync looks like, and the UI already falls back to a
+   * placeholder for it.
+   */
   try {
-    const { doc, setDoc } = await import('firebase/firestore');
-
-    // Upload first so the document is written once with its URL already present. Patching
-    // it afterwards risks leaving a scan that syncs to Android with a permanently missing
-    // image, because nothing would go back to fill it in.
-    const imageUrl = scan.imageUrl || (await uploadImage(uid, scan));
-
-    // imageDataUrl is still stripped: base64 blows past Firestore's 1 MB document limit.
-    // Only the URL travels.
+    // The full-resolution imageDataUrl is stripped - it would blow past Firestore's 1 MB
+    // document limit. A ~480px thumbnail travels in its place, which is what lets the
+    // other device show the picture without Cloud Storage.
     const { imageDataUrl, ...rest } = scan;
-    await setDoc(doc(db, 'users', uid, 'scans', scan.id), { ...rest, id: scan.id, imageUrl });
-
-    // Remember the URL locally so a later edit does not re-upload the same picture.
-    if (imageUrl && imageUrl !== scan.imageUrl) {
-      await localDb.scans.update(scan.id, { imageUrl });
+    const imageThumb = scan.imageThumb || (await makeThumb(scan.imageDataUrl));
+    await setDoc(ref, {
+      ...rest,
+      id: scan.id,
+      imageUrl: scan.imageUrl ?? '',
+      imageThumb,
+    });
+    if (imageThumb && imageThumb !== scan.imageThumb) {
+      await localDb.scans.update(scan.id, { imageThumb });
     }
   } catch (e) {
     console.error('[AgroVision sync] Upload failed:', explain(e), e);
+    return;   // no document to attach an image to
+  }
+
+  // Then the picture, best-effort. A failure here leaves a scan without an image, which
+  // is recoverable; it must never take the diagnosis down with it.
+  if (scan.imageUrl || !scan.imageDataUrl) return;
+  const imageUrl = await uploadImage(uid, scan);
+  if (!imageUrl) return;
+  try {
+    await updateDoc(ref, { imageUrl });
+    // Remember it locally so a later sync does not re-upload the same picture.
+    await localDb.scans.update(scan.id, { imageUrl });
+  } catch (e) {
+    console.error('[AgroVision sync] Could not attach image URL:', explain(e), e);
   }
 }
 
@@ -107,7 +181,7 @@ export async function unsyncScan(id: string): Promise<void> {
  *
  * Scans taken before signing in are stored under userId 'anonymous'. Because `useScans()`
  * filters by the signed-in uid, those rows would silently disappear from history once the
- * user logs in. On sign-in we re-tag them and upload them — they were never synced,
+ * user logs in. On sign-in we re-tag them and upload them - they were never synced,
  * because there was no account to sync them to at the time.
  */
 export async function claimAnonymousScans(uid: string): Promise<void> {
@@ -120,6 +194,52 @@ export async function claimAnonymousScans(uid: string): Promise<void> {
   console.info(`[AgroVision sync] Claimed ${claimed.length} scan(s) taken before sign-in`);
 
   for (const scan of claimed) await syncScan(scan);
+}
+
+/**
+ * One-off pass that uploads images for scans that synced before Storage existed.
+ *
+ * Enabling Firebase Storage does not retroactively fill in anything: syncScan() only
+ * uploads at the moment a scan is written, so every scan taken beforehand has an empty
+ * imageUrl and shows a placeholder on other devices forever. This walks local history and
+ * attaches the missing pictures.
+ *
+ * Only rows that still hold a local image can be recovered - a scan pulled down from
+ * another device never had one here, and there is nothing to upload.
+ *
+ * Bails out on the first failure rather than grinding through the whole list. If Storage
+ * is still disabled every attempt costs the full retry timeout, so a 50-scan history would
+ * otherwise stall for minutes on every sign-in for no benefit.
+ */
+export async function backfillScanImages(uid: string): Promise<void> {
+  const auth = await getAuthInstance();
+  const db = await getDb();
+  if (!auth?.currentUser || !db) return;
+
+  const rows = await localDb.scans.where('userId').equals(uid).toArray();
+  // Only rows that still hold a local image can be recovered - a scan pulled from another
+  // device never had one here, so there is nothing to build a thumbnail from.
+  const pending = rows.filter((s) => !s.imageThumb && s.imageDataUrl);
+  if (!pending.length) return;
+
+  const { doc, updateDoc } = await import('firebase/firestore');
+  let done = 0;
+
+  for (const scan of pending) {
+    const imageThumb = await makeThumb(scan.imageDataUrl);
+    if (!imageThumb) continue;    // unusable photo; skip it, don't abandon the rest
+    try {
+      await updateDoc(doc(db, 'users', uid, 'scans', scan.id), { imageThumb });
+      await localDb.scans.update(scan.id, { imageThumb });
+      done += 1;
+    } catch (e) {
+      // A write failure is systemic (rules, quota, offline), so stop rather than repeat it
+      // for every remaining scan.
+      console.error('[AgroVision sync] Backfill stopped:', explain(e), e);
+      break;
+    }
+  }
+  if (done) console.info(`[AgroVision sync] Backfilled ${done} scan image(s)`);
 }
 
 /**

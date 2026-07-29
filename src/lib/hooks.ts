@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { db, isCompleteScan, normalizeScan, type Scan } from './db';
 import { fetchWeather, getPosition, type Weather } from './weather';
-import { claimAnonymousScans, healLocalScans, subscribeToScans } from './sync';
+import { backfillScanImages, claimAnonymousScans, healLocalScans, subscribeToScans } from './sync';
 import { useApp } from '@/providers/AppProvider';
 import type { StringKey } from './i18n';
 
@@ -21,7 +21,7 @@ export function useCurrentUserId(): string {
 /**
  * Last line of defence for malformed rows.
  *
- * healLocalScans() repairs the store, but it is async — without this a component could
+ * healLocalScans() repairs the store, but it is async - without this a component could
  * render a bad row in the window before the repair lands and die on `.toFixed()`.
  * Complete rows are returned by identity, so downstream memoization is undisturbed.
  */
@@ -53,6 +53,9 @@ export function useScanSync(): void {
     void (async () => {
       await claimAnonymousScans(user.uid);
       await healLocalScans(user.uid);
+      // Last, and after healing, so it sees repaired rows and re-runs cheaply on every
+      // sign-in until Storage is available. No-op once every scan has a URL.
+      await backfillScanImages(user.uid);
     })();
     return subscribeToScans(user.uid);
   }, [user, firebaseReady]);

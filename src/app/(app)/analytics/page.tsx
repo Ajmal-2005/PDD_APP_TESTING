@@ -154,11 +154,11 @@ function OverviewTab({ stats, prevStats, scans }: { stats: Stats; prevStats: Sta
 function DiseasesTab({ stats, scans }: { stats: Stats; scans: import('@/lib/db').Scan[] }) {
   const { t } = useApp();
   const { diseaseText, diseaseSeries } = useLabels();
-  // Filter on the canonical name first — 'Healthy' is the stored value, not a display one.
+  // Filter on the canonical name first - 'Healthy' is the stored value, not a display one.
   const top = diseaseSeries(stats.byDisease.filter((d) => d.label !== 'Healthy').slice(0, 8))
     .map((d, i) => ({ ...d, color: seriesColor(i % 5) }));
 
-  // Mean confidence per disease — a proxy for how sure the model is per class.
+  // Mean confidence per disease - a proxy for how sure the model is per class.
   const confByDisease = useMemo(() => {
     const acc = new Map<string, { sum: number; n: number }>();
     for (const s of scans) {

@@ -33,7 +33,7 @@ export interface Stats {
   byDisease: { label: string; value: number }[];
   /** Counts per risk level, fixed order. */
   byRisk: { level: string; value: number }[];
-  /** DRI per scan, oldest first — the trend series. */
+  /** DRI per scan, oldest first - the trend series. */
   driSeries: { label: string; value: number; ts: number }[];
   /** Scans per calendar day across the window, oldest first. */
   perDay: { label: string; value: number; ts: number }[];
@@ -94,7 +94,7 @@ export function computeStats(scans: Scan[], locale = 'en'): Stats {
 
 /**
  * Signed change between two windows. Returns undefined when the previous window
- * has no data — showing "+100%" against zero history would be meaningless.
+ * has no data - showing "+100%" against zero history would be meaningless.
  */
 export function delta(current: number, prev: number, prevCount: number): number | undefined {
   if (prevCount === 0) return undefined;

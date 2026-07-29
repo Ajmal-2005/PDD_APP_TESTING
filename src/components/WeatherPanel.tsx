@@ -10,7 +10,7 @@ import type { Scan } from '@/lib/db';
 import type { StringKey } from '@/lib/i18n';
 import { useMemo } from 'react';
 
-/** Live conditions plus the spread forecast they drive — one panel, since the
+/** Live conditions plus the spread forecast they drive - one panel, since the
  *  forecast is meaningless without the weather that produced it. */
 export function WeatherPanel({ scans }: { scans: Scan[] | undefined }) {
   const { t } = useApp();

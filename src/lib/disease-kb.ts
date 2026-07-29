@@ -30,7 +30,7 @@ export interface DiseaseEntry {
   i18nKey: StringKey;
   /** Spray programme with timing. Empty when no chemical cure exists (viruses). */
   chemical: string[];
-  /** Non-chemical measures — for viruses these are the ONLY effective controls. */
+  /** Non-chemical measures - for viruses these are the ONLY effective controls. */
   cultural: string[];
   /** Organic / low-residue alternatives. */
   organic: string[];
@@ -46,7 +46,7 @@ export const RESISTANCE_NOTE =
 
 export const LABEL_NOTE =
   'Product registrations, permitted rates and pre-harvest intervals differ by country and ' +
-  'crop stage. The product label is the legal authority — always read it before mixing, and ' +
+  'crop stage. The product label is the legal authority - always read it before mixing, and ' +
   'confirm the pre-harvest interval before picking.';
 
 interface Seed {
@@ -64,7 +64,7 @@ const SEEDS: Seed[] = [
       'Dark brown, firm lesions on stems and green fruit',
       'Whole leaves blacken and collapse within days',
     ],
-    conditions: 'Cool, wet weather — 10–24 °C with humidity above 90% or prolonged leaf wetness.',
+    conditions: 'Cool, wet weather - 10-24 °C with humidity above 90% or prolonged leaf wetness.',
     spreads: 'Airborne spores travel several kilometres on wind and rain splash.',
   },
   {
@@ -76,7 +76,7 @@ const SEEDS: Seed[] = [
       'Lower, older leaves affected first',
       'Dark sunken collar rot at the stem base on seedlings',
     ],
-    conditions: 'Warm and humid — 24–29 °C with alternating wet and dry spells.',
+    conditions: 'Warm and humid - 24-29 °C with alternating wet and dry spells.',
     spreads: 'Rain splash and irrigation carry spores up from infected soil and debris.',
   },
   {
@@ -88,7 +88,7 @@ const SEEDS: Seed[] = [
       'Raised scabby lesions on fruit',
       'Leaf yellowing and early drop',
     ],
-    conditions: 'Warm and wet — 24–30 °C with driving rain or overhead irrigation.',
+    conditions: 'Warm and wet - 24-30 °C with driving rain or overhead irrigation.',
     spreads: 'Splashing water, contaminated seed, and handling plants while foliage is wet.',
   },
   {
@@ -100,7 +100,7 @@ const SEEDS: Seed[] = [
       'Begins on lower leaves after the first fruit sets',
       'Severe yellowing and leaf drop from the bottom up',
     ],
-    conditions: 'Moderate temperatures, 20–25 °C, with extended leaf wetness.',
+    conditions: 'Moderate temperatures, 20-25 °C, with extended leaf wetness.',
     spreads: 'Rain splash, overhead watering, tools, and hands moving through a wet crop.',
   },
   {
@@ -112,7 +112,7 @@ const SEEDS: Seed[] = [
       'Leaves curl, wither and drop while still attached',
       'Rarely reaches the fruit',
     ],
-    conditions: 'High humidity above 85% with poor airflow, typically 22–24 °C under cover.',
+    conditions: 'High humidity above 85% with poor airflow, typically 22-24 °C under cover.',
     spreads: 'Spores move on air currents, tools and clothing inside the greenhouse.',
   },
   {
@@ -124,7 +124,7 @@ const SEEDS: Seed[] = [
       'Sunken, pitted spots on the fruit surface',
       'Heavy defoliation in a wet season',
     ],
-    conditions: 'Warm and wet — 20–28 °C with long periods of leaf wetness.',
+    conditions: 'Warm and wet - 20-28 °C with long periods of leaf wetness.',
     spreads: 'Wind-blown spores and rain splash from infected crop debris.',
   },
   {
@@ -136,12 +136,12 @@ const SEEDS: Seed[] = [
       'Severely stunted, bushy growth',
       'Flowers drop; almost no fruit sets after infection',
     ],
-    conditions: 'Hot, dry weather that favours whitefly populations, 25–35 °C.',
-    spreads: 'Transmitted only by the silverleaf whitefly — not by seed, tools or contact.',
+    conditions: 'Hot, dry weather that favours whitefly populations, 25-35 °C.',
+    spreads: 'Transmitted only by the silverleaf whitefly - not by seed, tools or contact.',
   },
   {
     id: 'mosaic-virus', disease: 'Tomato Mosaic Virus', pathogen: 'viral', severity: 'high',
-    summary: 'Extremely stable — it survives in dry debris for years and spreads on hands and tools.',
+    summary: 'Extremely stable - it survives in dry debris for years and spreads on hands and tools.',
     symptoms: [
       'Mottled light and dark green mosaic on the leaves',
       'Fern-like narrowing and distortion of young leaves',
@@ -149,7 +149,7 @@ const SEEDS: Seed[] = [
       'Uneven ripening and stunted growth',
     ],
     conditions: 'Any growing condition; the virus is not weather-dependent.',
-    spreads: 'Mechanical contact — hands, tools, clothing, and infected seed.',
+    spreads: 'Mechanical contact - hands, tools, clothing, and infected seed.',
   },
   {
     id: 'spider-mites', disease: 'Spider Mites Two-spotted Spider Mite', pathogen: 'pest', severity: 'medium',
@@ -160,12 +160,12 @@ const SEEDS: Seed[] = [
       'Leaves bronze, dry out and fall',
       'Tiny moving specks visible with a hand lens',
     ],
-    conditions: 'Hot and dry — above 30 °C with low humidity, worst on drought-stressed plants.',
+    conditions: 'Hot and dry - above 30 °C with low humidity, worst on drought-stressed plants.',
     spreads: 'Wind, clothing, tools, and movement of infested plant material.',
   },
   {
     id: 'healthy', disease: 'Healthy', pathogen: 'none', severity: 'none',
-    summary: 'No disease detected. Keep scouting — most outbreaks are cheapest to stop in the first week.',
+    summary: 'No disease detected. Keep scouting - most outbreaks are cheapest to stop in the first week.',
     symptoms: [
       'Uniform green colour with no spotting or mottling',
       'Firm, flat leaves with no curling',
@@ -192,28 +192,28 @@ interface Protocol { chemical: string[]; cultural: string[]; organic: string[]; 
 const PROTOCOLS: Record<string, Protocol> = {
   'late-blight': {
     chemical: [
-      'ACT IMMEDIATELY — an untreated field can collapse in under two weeks.',
-      'Protectant base: Mancozeb 75% WP at 2 g/L, or Chlorothalonil, on a 5–7 day interval in wet weather.',
+      'ACT IMMEDIATELY - an untreated field can collapse in under two weeks.',
+      'Protectant base: Mancozeb 75% WP at 2 g/L, or Chlorothalonil, on a 5-7 day interval in wet weather.',
       'Systemic knockdown for active infection: Metalaxyl-M + Mancozeb, or Cymoxanil + Mancozeb.',
       'Newer targeted actives: Cyazofamid, Mandipropamid, or Oxathiapiprolin-based products.',
       'Shorten the interval to 5 days while rain and fog persist; protectants wash off.',
     ],
     cultural: [
-      'Remove and destroy infected plants — bury or burn, never compost.',
+      'Remove and destroy infected plants - bury or burn, never compost.',
       'Improve field drainage and avoid overhead irrigation.',
       'Do not work the crop while foliage is wet.',
       'Destroy volunteer tomato and potato plants and nearby cull piles.',
     ],
     organic: [
       'Fixed copper (e.g. copper hydroxide) applied preventively before infection.',
-      'Copper is protectant only — it cannot cure established lesions.',
+      'Copper is protectant only - it cannot cure established lesions.',
     ],
-    monitoring: 'Inspect lower leaves every 2–3 days once night temperatures fall and dew persists past sunrise.',
+    monitoring: 'Inspect lower leaves every 2-3 days once night temperatures fall and dew persists past sunrise.',
   },
   'early-blight': {
     chemical: [
       'Begin at first symptom, or when warm humid weather sets in after fruit set.',
-      'Protectant: Mancozeb 75% WP at 2 g/L or Chlorothalonil, 7–10 day interval.',
+      'Protectant: Mancozeb 75% WP at 2 g/L or Chlorothalonil, 7-10 day interval.',
       'Systemic options: Azoxystrobin, Difenoconazole, or Boscalid.',
       'Alternate protectant and systemic sprays rather than repeating one product.',
     ],
@@ -222,7 +222,7 @@ const PROTOCOLS: Record<string, Protocol> = {
       'Mulch to stop soil splashing onto foliage.',
       'Water at the base of the plant, never over the canopy.',
       'Stake plants and widen spacing to speed canopy drying.',
-      'Maintain balanced nitrogen — stressed plants are hit hardest.',
+      'Maintain balanced nitrogen - stressed plants are hit hardest.',
     ],
     organic: [
       'Copper-based fungicide on a weekly schedule.',
@@ -232,13 +232,13 @@ const PROTOCOLS: Record<string, Protocol> = {
   },
   septoria: {
     chemical: [
-      'Protectant: Mancozeb 75% WP at 2 g/L or Chlorothalonil, 7–10 day interval.',
+      'Protectant: Mancozeb 75% WP at 2 g/L or Chlorothalonil, 7-10 day interval.',
       'Copper products are effective and suit organic production.',
-      'Continue on schedule through the wet period — it rarely kills the plant, but defoliation cuts yield sharply.',
+      'Continue on schedule through the wet period - it rarely kills the plant, but defoliation cuts yield sharply.',
     ],
     cultural: [
       'Remove infected lower leaves and destroy them.',
-      'Rotate away from tomato for 2–3 years.',
+      'Rotate away from tomato for 2-3 years.',
       'Stake plants and increase spacing for airflow.',
       'Clear crop debris and solanaceous weeds that harbour the fungus.',
       'Avoid working in the field while plants are wet.',
@@ -251,13 +251,13 @@ const PROTOCOLS: Record<string, Protocol> = {
   },
   'bacterial-spot': {
     chemical: [
-      'There is NO curative spray — bactericides only slow spread, so prevention carries the load.',
+      'There is NO curative spray - bactericides only slow spread, so prevention carries the load.',
       'Fixed copper tank-mixed with Mancozeb, applied preventively on a 7 day interval.',
       'Copper alone is weaker where copper-tolerant strains are present.',
       'Stop overhead irrigation before spraying, or the spray is wasted.',
     ],
     cultural: [
-      'Use certified disease-free or hot-water-treated seed — seed is the usual entry point.',
+      'Use certified disease-free or hot-water-treated seed - seed is the usual entry point.',
       'Rotate crops for at least 2 years away from tomato and pepper.',
       'Switch to drip irrigation and avoid overhead watering entirely.',
       'Never handle or prune plants while wet.',
@@ -273,11 +273,11 @@ const PROTOCOLS: Record<string, Protocol> = {
     chemical: [
       'Chlorothalonil or Mancozeb where registered for protected cropping.',
       'Copper-based products are an effective alternative.',
-      'Sprays are secondary here — humidity control does more than any fungicide.',
+      'Sprays are secondary here - humidity control does more than any fungicide.',
     ],
     cultural: [
       'Increase ventilation and air movement; this is the single most effective measure.',
-      'Hold humidity below 85% — vent and heat in the evening to prevent condensation.',
+      'Hold humidity below 85% - vent and heat in the evening to prevent condensation.',
       'Widen plant spacing and prune lower leaves to open the canopy.',
       'Remove infected leaves and all crop residue between cycles.',
       'Use resistant cultivars where available.',
@@ -290,8 +290,8 @@ const PROTOCOLS: Record<string, Protocol> = {
   },
   'target-spot': {
     chemical: [
-      'Apply preventively — it attacks fruit directly, unlike early blight.',
-      'Azoxystrobin, Chlorothalonil or Mancozeb on a 7–10 day interval.',
+      'Apply preventively - it attacks fruit directly, unlike early blight.',
+      'Azoxystrobin, Chlorothalonil or Mancozeb on a 7-10 day interval.',
       'Rotate modes of action; this pathogen develops resistance readily.',
     ],
     cultural: [
@@ -308,13 +308,13 @@ const PROTOCOLS: Record<string, Protocol> = {
   },
   'yellow-leaf-curl': {
     chemical: [
-      'No chemical cures an infected plant — fungicides and antibiotics do nothing.',
+      'No chemical cures an infected plant - fungicides and antibiotics do nothing.',
       'Control the whitefly vector instead: systemic insecticide at transplant, then rotate actives.',
-      'Avoid repeated pyrethroid use — it kills whitefly predators and worsens outbreaks.',
+      'Avoid repeated pyrethroid use - it kills whitefly predators and worsens outbreaks.',
       'Integrated control suppresses this virus far better than insecticides alone.',
     ],
     cultural: [
-      'Plant TYLCV-resistant varieties — the single most effective measure.',
+      'Plant TYLCV-resistant varieties - the single most effective measure.',
       'Start with virus-free and whitefly-free transplants.',
       'Rogue out infected plants immediately; bag them before removal so whiteflies do not disperse.',
       'Use insect-proof netting (50 mesh) on nurseries and protected structures.',
@@ -334,26 +334,26 @@ const PROTOCOLS: Record<string, Protocol> = {
       'Sanitation is the entire control programme.',
     ],
     cultural: [
-      'Remove and destroy infected plants immediately — do not compost.',
+      'Remove and destroy infected plants immediately - do not compost.',
       'Use certified virus-free seed, or hot-water-treat seed before sowing.',
       'Wash hands with soap and disinfect tools between plants; milk or skim-milk dips inactivate the virus.',
-      'Do not use tobacco products near the crop — ToMV and TMV survive in cured tobacco.',
+      'Do not use tobacco products near the crop - ToMV and TMV survive in cured tobacco.',
       'Choose resistant cultivars carrying the Tm-2a gene.',
       'Remove all crop debris; the virus persists in dry residue for years.',
     ],
-    organic: ['Strict sanitation and resistant varieties — no product substitutes for these.'],
+    organic: ['Strict sanitation and resistant varieties - no product substitutes for these.'],
     monitoring: 'Inspect young growing tips weekly; mosaic shows first on new leaves, unlike blights which start low.',
   },
   'spider-mites': {
     chemical: [
-      'Use a true miticide — ordinary insecticides do not control mites.',
+      'Use a true miticide - ordinary insecticides do not control mites.',
       'Effective actives include Abamectin, Bifenazate, Spiromesifen or Fenpyroximate.',
       'Direct the spray at leaf UNDERSIDES, where mites actually live.',
-      'AVOID broad-spectrum pyrethroids and carbaryl — they kill predatory mites and cause flare-ups.',
+      'AVOID broad-spectrum pyrethroids and carbaryl - they kill predatory mites and cause flare-ups.',
       'Rotate IRAC groups; this mite develops resistance faster than almost any other pest.',
     ],
     cultural: [
-      'Keep plants well watered — water stress is the main trigger for outbreaks.',
+      'Keep plants well watered - water stress is the main trigger for outbreaks.',
       'Raise humidity around the canopy where practical.',
       'Remove and bag heavily infested leaves.',
       'Control dusty conditions on field margins and roads; dust favours mites.',
@@ -367,10 +367,10 @@ const PROTOCOLS: Record<string, Protocol> = {
   },
   healthy: {
     chemical: [
-      'No treatment required. Do not spray preventively without cause — unnecessary applications accelerate resistance and kill beneficial insects.',
+      'No treatment required. Do not spray preventively without cause - unnecessary applications accelerate resistance and kill beneficial insects.',
     ],
     cultural: [
-      'Continue weekly scouting — most outbreaks are cheapest to stop in the first week.',
+      'Continue weekly scouting - most outbreaks are cheapest to stop in the first week.',
       'Maintain balanced fertilisation and consistent irrigation.',
       'Keep mulch in place and preserve airflow through the canopy.',
       'Practise crop rotation to keep soil-borne inoculum low.',

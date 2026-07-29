@@ -60,6 +60,14 @@ export async function getStorageInstance() {
   if (!_storage) {
     const { getStorage } = await import('firebase/storage');
     _storage = getStorage(a);
+    /*
+     * The SDK default is 10 minutes of retries. That is sensible for a flaky network but
+     * wrong for a bucket that does not exist yet: it turns "Storage is not enabled" into
+     * a ten-minute silent stall instead of a prompt, logged failure. Scan images are
+     * small and retryable on the next sync, so fail fast and keep the UI honest.
+     */
+    _storage.maxUploadRetryTime = 20_000;
+    _storage.maxOperationRetryTime = 20_000;
   }
   return _storage;
 }

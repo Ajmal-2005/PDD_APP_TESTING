@@ -96,7 +96,7 @@ export default function ScanDetailPage() {
         <div className="col-span-12 space-y-4 lg:col-span-4">
           <Panel>
             <PanelBody className="flex flex-col items-center gap-3 text-center">
-              <ScanThumb src={scan.imageDataUrl} remoteSrc={scan.imageUrl} className="aspect-square w-full rounded-xl border border-line object-cover" iconSize={44} />
+              <ScanThumb src={scan.imageDataUrl} remoteSrc={scan.imageThumb || scan.imageUrl} className="aspect-square w-full rounded-xl border border-line object-cover" iconSize={44} />
               <div>
                 <h1 className="text-title text-ink">{diseaseName(scan)}</h1>
                 {SCIENTIFIC_NAMES[scan.disease] && (

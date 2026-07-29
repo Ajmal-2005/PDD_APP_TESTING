@@ -7,7 +7,7 @@ export interface Slice { label: string; value: number; color: string }
 
 /**
  * Donut for a part-to-whole split. Segments are separated by a 2px gap in the
- * surface colour rather than a stroke, and the legend always ships — hue alone
+ * surface colour rather than a stroke, and the legend always ships - hue alone
  * never carries identity.
  */
 export function Donut({ slices, size = 168, thickness = 22, centerLabel, centerValue, className }: {

@@ -5,7 +5,7 @@ import { cx } from '@/lib/utils';
 export interface BarDatum { label: string; value: number; color?: string; hint?: string }
 
 /**
- * Horizontal bar list — the right form for ranked magnitude with long category
+ * Horizontal bar list - the right form for ranked magnitude with long category
  * names, which a column chart would have to angle or truncate.
  * Value rides at the tip of each bar (direct label), so no x-axis is needed.
  */

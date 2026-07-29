@@ -15,7 +15,7 @@ export async function fetchWeather(lat: number, lon: number): Promise<Weather> {
  * Did this scan actually capture a weather reading?
  *
  * Scans taken with geolocation denied, offline, or before the weather call resolved were
- * stored as 0 C / 0 % / "Clear" — a fabricated reading indistinguishable from a real one,
+ * stored as 0 C / 0 % / "Clear" - a fabricated reading indistinguishable from a real one,
  * which is why history showed a confident 0 C. Newer scans record an empty condition
  * instead, but older rows and anything synced from Android still carry the old defaults,
  * so the check has to catch both.

@@ -226,7 +226,7 @@ export default function ScanWorkspace() {
                       variant="primary"
                       icon={analyzing ? undefined : <ScanLine size={16} />}
                       loading={analyzing}
-                      // Only runnable with a working model — otherwise the click fails
+                      // Only runnable with a working model - otherwise the click fails
                       // with a raw runtime error the farmer cannot act on.
                       disabled={!image || modelState !== 'ready' || !!outcome}
                       onClick={() => image && run(image)}
@@ -265,7 +265,7 @@ export default function ScanWorkspace() {
 /**
  * Terminal error state for an image that is not a usable tomato leaf.
  *
- * Deliberately shows NO diagnosis, confidence, DRI, treatment or prevention — presenting
+ * Deliberately shows NO diagnosis, confidence, DRI, treatment or prevention - presenting
  * any of those would imply the model produced a real finding, which it did not. Nothing
  * is written to IndexedDB or Firestore, and no report can be generated.
  */
@@ -325,7 +325,7 @@ function DiagnosisResult({ outcome, onOpenReport }: { outcome: ReturnType<typeof
 
   async function copySummary() {
     const text = [
-      `AgroVision AI — ${name}`,
+      `AgroVision AI - ${name}`,
       SCIENTIFIC_NAMES[result.disease] && `(${SCIENTIFIC_NAMES[result.disease]})`,
       `Confidence: ${(result.confidence * 100).toFixed(1)}%`,
       `Risk: ${result.riskLevel} · DRI ${result.driScore.toFixed(1)}/10`,

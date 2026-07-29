@@ -6,7 +6,7 @@ import { cx } from '@/lib/utils';
 
 /**
  * Drag-and-drop image input. A desktop affordance the Android build had no
- * equivalent for — on a phone the only sources are camera and gallery picker.
+ * equivalent for - on a phone the only sources are camera and gallery picker.
  */
 export function Dropzone({ onFile, className, compact, title, hint, browseLabel, children }: {
   onFile: (dataUrl: string, file: File) => void;

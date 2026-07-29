@@ -21,7 +21,7 @@ export default function SplashScreen() {
      * Route as soon as auth resolves.
      *
      * This used to sit behind an unconditional 500 ms setTimeout whose comment claimed the
-     * delay was skipped when auth resolved quickly — it never was, so every single entry
+     * delay was skipped when auth resolved quickly - it never was, so every single entry
      * into the app paid it. Resolving auth already takes long enough for the splash to be
      * seen; padding it is half a second charged to every launch for nothing.
      */

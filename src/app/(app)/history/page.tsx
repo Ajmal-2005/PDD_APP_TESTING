@@ -114,7 +114,7 @@ export default function HistoryPage() {
                 <Tr key={s.id} onClick={() => router.push(`/history/${s.id}`)}>
                   <Td>
                     <div className="flex items-center gap-3">
-                      <ScanThumb src={s.imageDataUrl} remoteSrc={s.imageUrl} className="h-10 w-10 shrink-0 rounded-lg border border-line object-cover" iconSize={16} />
+                      <ScanThumb src={s.imageDataUrl} remoteSrc={s.imageThumb || s.imageUrl} className="h-10 w-10 shrink-0 rounded-lg border border-line object-cover" iconSize={16} />
                       <div className="min-w-0">
                         <p className="truncate font-medium text-ink">{diseaseName(s)}</p>
                         <p className="truncate text-[11.5px] text-ink-3">

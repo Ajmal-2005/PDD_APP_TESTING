@@ -18,7 +18,7 @@ const COLUMNS: { header: string; get: (s: Scan) => string | number }[] = [
   { header: 'Conditions', get: (s) => s.weatherCondition },
 ];
 
-/** Downloads the given scans as a CSV. Images are omitted — they don't belong in a spreadsheet. */
+/** Downloads the given scans as a CSV. Images are omitted - they don't belong in a spreadsheet. */
 export function exportScansCsv(scans: Scan[], filename = 'agrovision-scans.csv') {
   const rows = [
     COLUMNS.map((c) => c.header).join(','),

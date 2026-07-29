@@ -6,7 +6,7 @@ import { hasValidWeather } from './weather';
 /**
  * Professional PDF scan report (web equivalent of utils/PdfReportGenerator.kt).
  *
- * Language note: jsPDF's built-in fonts are Latin-only and cannot render Tamil glyphs —
+ * Language note: jsPDF's built-in fonts are Latin-only and cannot render Tamil glyphs -
  * emitting Tamil through them produces blank or garbled text. This report is therefore
  * always generated in English, using the canonical disease name. That is also the useful
  * behaviour in practice: the report is the artefact shared with agronomists, buyers and
@@ -35,7 +35,7 @@ export async function generateReport(scan: Scan): Promise<void> {
   const W = pdf.internal.pageSize.getWidth();
 
   pdf.setProperties({
-    title: `AgroVision AI — ${scan.disease}`,
+    title: `AgroVision AI - ${scan.disease}`,
     subject: 'Tomato Leaf Disease Analysis Report',
     author: 'AgroVision AI',
     creator: 'AgroVision AI',
@@ -114,7 +114,7 @@ export async function generateReport(scan: Scan): Promise<void> {
   ];
   // Conditions only when the scan really captured them. This report is shared with
   // agronomists and buyers, so printing "0°C · 0% RH · Clear" is worse than printing
-  // nothing — it is a fabricated field-condition record on a document people act on.
+  // nothing - it is a fabricated field-condition record on a document people act on.
   if (hasValidWeather(scan)) {
     rows.push(['Conditions', `${Math.round(scan.temperature)}°C · ${scan.humidity}% RH · ${scan.weatherCondition}`]);
   }
@@ -154,13 +154,13 @@ export async function generateReport(scan: Scan): Promise<void> {
   const kb = kbByDisease(scan.disease);
 
   section('What to look for', kb?.symptoms ?? []);
-  section('Treatment — chemical control', kb?.chemical ?? []);
-  section('Treatment — organic / low-residue options', kb?.organic ?? []);
+  section('Treatment - chemical control', kb?.chemical ?? []);
+  section('Treatment - organic / low-residue options', kb?.organic ?? []);
   section('Cultural control and prevention', kb?.cultural ?? []);
 
   // The scan's own stored advice, as a quick cross-check against the reference above.
-  section('Quick reference — immediate steps', lines(scan.treatment));
-  section('Quick reference — prevention', lines(scan.prevention));
+  section('Quick reference - immediate steps', lines(scan.treatment));
+  section('Quick reference - prevention', lines(scan.prevention));
 
   if (kb?.monitoring) section('Monitoring', [kb.monitoring]);
   if (kb?.conditions) {

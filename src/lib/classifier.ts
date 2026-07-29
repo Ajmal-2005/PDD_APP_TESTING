@@ -2,7 +2,7 @@ import type * as tfTypes from '@tensorflow/tfjs-core';
 import { toDataUrl } from './utils';
 
 /**
- * TensorFlow.js is loaded lazily — the static `import type` above costs nothing
+ * TensorFlow.js is loaded lazily - the static `import type` above costs nothing
  * at runtime; the real module (~1.5 MB parsed) is only fetched on first call to
  * `getTf()`, which happens inside `loadModel()` / `classify()`.
  */
@@ -24,7 +24,7 @@ async function getTf(): Promise<typeof tfTypes> {
  * The TFLite runtime is loaded as a script at runtime rather than imported.
  *
  * `@tensorflow/tfjs-tflite`'s ESM entry imports `./tflite_web_api_client`, a file that
- * only exists under the package's `wasm/` folder — webpack cannot resolve it and the
+ * only exists under the package's `wasm/` folder - webpack cannot resolve it and the
  * build fails. Its self-contained UMD bundle has no such problem, so we serve that (and
  * the WASM binaries) from /public/tflite and pick the API up off `window`.
  */
@@ -48,7 +48,7 @@ async function loadTfliteRuntime(): Promise<TFLiteRuntime> {
       if (typeof window === 'undefined') throw new Error('TFLite requires a browser');
       if (window.tflite) return window.tflite;
 
-      // The UMD bundle resolves tfjs-core off the global, so publish ours first —
+      // The UMD bundle resolves tfjs-core off the global, so publish ours first -
       // otherwise it would pull a second, mismatched copy.
       const tf = await getTf();
       window.tf = tf;
@@ -85,7 +85,7 @@ export interface ClassificationResult {
    * terminal error state: no diagnosis, no persistence, no report.
    */
   invalid: boolean;
-  /** Why it was rejected — 'not_tomato' | 'low_confidence'. Undefined when valid. */
+  /** Why it was rejected - 'not_tomato' | 'low_confidence'. Undefined when valid. */
   invalidReason?: 'not_tomato' | 'low_confidence';
 }
 
@@ -104,7 +104,7 @@ const INPUT_SIZE = 224;
 
 /**
  * Confidence floor. Below this the prediction is treated as an INVALID image rather
- * than a diagnosis — an uncertain guess about someone's crop is worse than no answer.
+ * than a diagnosis - an uncertain guess about someone's crop is worse than no answer.
  */
 const MIN_CONFIDENCE = 0.55;
 
@@ -122,13 +122,13 @@ let labels: string[] = [];
  *
  * A cached HEAD makes this answer a stale question: after a model file was removed the
  * probe still reported 200 from cache, so the loader took the branch for a model that was
- * no longer there. The reverse is worse — a cached 404 hides a model you just installed.
+ * no longer there. The reverse is worse - a cached 404 hides a model you just installed.
  */
 const exists = async (url: string) => {
   try { return (await fetch(url, { method: 'HEAD', cache: 'no-store' })).ok; } catch { return false; }
 };
 
-/** labels.json (TF.js export) or labels.txt (Android assets) — accept either. */
+/** labels.json (TF.js export) or labels.txt (Android assets) - accept either. */
 async function loadLabels(): Promise<string[]> {
   // Never a cached copy: labels are positional, so pairing a new model with stale labels
   // renames every class silently rather than failing.
@@ -139,7 +139,7 @@ async function loadLabels(): Promise<string[]> {
   }
   const txt = await fetch(LABELS_URL);
   if (!txt.ok) throw new Error(`No labels file found (${LABELS_JSON_URL} or ${LABELS_URL})`);
-  // labels.txt is indentation-padded in the Android assets — trim every line.
+  // labels.txt is indentation-padded in the Android assets - trim every line.
   const lines = (await txt.text()).split(/\r?\n/).map((l) => l.trim()).filter(Boolean);
   if (!lines.length) throw new Error('labels file is empty');
   return lines;
@@ -148,7 +148,7 @@ async function loadLabels(): Promise<string[]> {
 /**
  * Loads whichever model format is present.
  *
- * TF.js graph model is preferred — it is what the training notebook exports and what
+ * TF.js graph model is preferred - it is what the training notebook exports and what
  * runs fastest in a browser. The .tflite path exists so the Android asset can be used
  * directly, but note the runtime constraint: `@tensorflow/tfjs-tflite` (alpha.10, the
  * latest published) ships an old TFLite WASM build, so a model whose metadata demands a
@@ -197,15 +197,15 @@ export const isModelLoaded = () => labels.length > 0;
  *
  * `agrovision_model.tflite` requires TFLite runtime >= 2.20 and the only published browser
  * runtime is far older, so in-browser loading fails outright. `/api/classify` forwards to
- * predict_server.py, which runs the identical file the Android app ships — same weights,
+ * predict_server.py, which runs the identical file the Android app ships - same weights,
  * same graph, same raw-0-255 preprocessing. The phone and the website therefore return the
  * same prediction for the same photo.
  *
  * This is real inference, not a stand-in: the scores come from the model. If the service
- * is unreachable this throws, and the scan page shows its "model not installed" banner —
+ * is unreachable this throws, and the scan page shows its "model not installed" banner -
  * it must never invent a result, because callers persist, sync and print what they get.
  */
-/** Is server-side inference reachable? Cheap probe — no image, no inference. */
+/** Is server-side inference reachable? Cheap probe - no image, no inference. */
 export async function serverInferenceAvailable(): Promise<boolean> {
   try {
     const res = await fetch('/api/classify', { cache: 'no-store' });
@@ -237,7 +237,7 @@ async function classifyOnServer(dataUrl: string): Promise<number[]> {
 
 /**
  * The model carries its own preprocessing (Rescaling 1/127.5, offset -1) inside the
- * graph, exactly as the Android build does — TFLiteClassifier.kt feeds raw 0-255 floats
+ * graph, exactly as the Android build does - TFLiteClassifier.kt feeds raw 0-255 floats
  * into its ByteBuffer. So we feed raw 0-255 here too and must NOT normalize.
  */
 export async function classify(
@@ -247,8 +247,8 @@ export async function classify(
    * In-browser first, server second.
    *
    * A local model (the TF.js export the training notebook produces) is preferred: it needs
-   * no network and no second process. When none is installed — today's situation, since
-   * the Android .tflite cannot initialise in any published browser runtime — inference
+   * no network and no second process. When none is installed - today's situation, since
+   * the Android .tflite cannot initialise in any published browser runtime - inference
    * moves to /api/classify, which runs that same .tflite server-side.
    *
    * Both paths end at interpret(), so the argmax, the Not_Tomato gate, MIN_CONFIDENCE and
@@ -259,7 +259,7 @@ export async function classify(
     localModel = await loadModel();
   } catch (localErr) {
     console.info('[AgroVision] No in-browser model; using server inference.', localErr);
-    // Re-encode at the model's own input size — sending a full-resolution photo would
+    // Re-encode at the model's own input size - sending a full-resolution photo would
     // upload megabytes for an image the server immediately downsamples to 224x224.
     return interpret(await classifyOnServer(toDataUrl(source, 640)));
   }
@@ -277,7 +277,7 @@ export async function classify(
    * If inference fails, the error propagates. There is deliberately no fallback that
    * invents scores.
    *
-   * A previous revision substituted a colour-heuristic "classifier" here — average RGB
+   * A previous revision substituted a colour-heuristic "classifier" here - average RGB
    * and dark/yellow pixel ratios mapped to real disease names at 0.83-0.95 confidence.
    * That clears MIN_CONFIDENCE, so the guess was persisted, synced and printed into a
    * PDF report, indistinguishable from a model output. A leaf photographed in shade came
@@ -338,7 +338,7 @@ export function interpret(scores: number[]): ClassificationResult {
 
   const driScore = calculateDRI(confidence, disease);
   const riskLevel = driScore >= 7 ? 'HIGH' : driScore >= 4 ? 'MEDIUM' : driScore >= 1 ? 'LOW' : 'SAFE';
-  // Severity describes the disease, so a healthy leaf has none — being 95% sure a leaf is
+  // Severity describes the disease, so a healthy leaf has none - being 95% sure a leaf is
   // healthy previously rendered as "Severity: High".
   const severity =
     disease.toLowerCase() === 'healthy'
@@ -354,7 +354,7 @@ export function interpret(scores: number[]): ClassificationResult {
  * Two corrections applied to both platforms at once:
  *
  *  1. Healthy short-circuits to 0. Scaling confidence by 6 meant a 0.95-confidence
- *     "Healthy" scored 8.7 and tripped the >= 7 HIGH threshold — the app reported a
+ *     "Healthy" scored 8.7 and tripped the >= 7 HIGH threshold - the app reported a
  *     confidently healthy leaf as high risk. Confidence is certainty ABOUT a class, not
  *     the severity OF one.
  *  2. Leaf Mold, Target Spot and Spider Mites previously fell through to 0, the same

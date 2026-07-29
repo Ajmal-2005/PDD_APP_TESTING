@@ -15,3 +15,8 @@ next-env.d.ts
 # Miscellaneous
 .DS_Store
 .claude/
+__pycache__/
+*.pyc
+*.pyo
+~$*.xlsx
+

@@ -11,7 +11,7 @@ import type { StringKey } from './i18n';
  * was active when the scan ran. Rendering it directly means an account that switches
  * language ends up with a history list mixing English and Tamil. So every label is
  * derived at RENDER time from the canonical, language-independent fields
- * (`scan.disease`, `scan.severity`) — the stored translation is display-legacy only and
+ * (`scan.disease`, `scan.severity`) - the stored translation is display-legacy only and
  * is deliberately never shown.
  */
 export const diseaseKey = (disease: string): StringKey =>
@@ -53,7 +53,7 @@ export function useLabels() {
     /**
      * Translate the `label` of every item in a stats series.
      *
-     * Apply this BEFORE `foldTail` — the "Other" bucket it appends is already translated,
+     * Apply this BEFORE `foldTail` - the "Other" bucket it appends is already translated,
      * and running it back through `diseaseKey` would collapse it to "Unknown".
      */
     diseaseSeries: <T extends { label: string }>(items: T[]): T[] =>

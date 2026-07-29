@@ -37,7 +37,7 @@ export function axisTicks(max: number, count = 4): number[] {
   return Array.from({ length: count + 1 }, (_, i) => (max / count) * i);
 }
 
-/** 1,284 / 12.9K / 4.2M — compact figures for stat tiles and axis ticks. */
+/** 1,284 / 12.9K / 4.2M - compact figures for stat tiles and axis ticks. */
 export function compact(n: number): string {
   if (Math.abs(n) >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`;
   if (Math.abs(n) >= 10_000) return `${(n / 1000).toFixed(1)}K`;

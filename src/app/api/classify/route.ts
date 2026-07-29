@@ -9,7 +9,7 @@ import { NextResponse } from 'next/server';
  *
  * The model is fine outside the browser, so predict_server.py runs the exact file the
  * Android app loads from its assets and this route forwards to it. Same weights, same
- * graph, same preprocessing — the website and the phone agree on the same photo.
+ * graph, same preprocessing - the website and the phone agree on the same photo.
  *
  * Node runtime, not edge: this talks to a loopback address, which edge cannot reach.
  */
@@ -75,7 +75,7 @@ export async function POST(request: Request) {
      * Deliberately an error, never a guess.
      *
      * The scan page turns this into the "AI model not installed" banner. Returning
-     * invented scores here would be indistinguishable from a real diagnosis downstream —
+     * invented scores here would be indistinguishable from a real diagnosis downstream -
      * it would be persisted, synced and printed into a PDF report.
      */
     const reason = (e as Error)?.name === 'TimeoutError'

@@ -5,7 +5,7 @@ import { cx } from '@/lib/utils';
 
 export interface TabItem<T extends string> { value: T; label: string; icon?: ReactNode; count?: number }
 
-/** Underlined tabs — the desktop convention for switching a panel's content. */
+/** Underlined tabs - the desktop convention for switching a panel's content. */
 export function Tabs<T extends string>({ items, value, onChange, className }: {
   items: TabItem<T>[]; value: T; onChange: (v: T) => void; className?: string;
 }) {

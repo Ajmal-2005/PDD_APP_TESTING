@@ -22,10 +22,19 @@ export interface Scan {
   /**
    * Firebase Storage download URL for the same picture, shared with Android via the
    * `imageUrl` field on the scan document. Empty when the upload has not finished, or
-   * when the scan predates image sync — callers fall back to imageDataUrl, then to a
+   * when the scan predates image sync - callers fall back to imageDataUrl, then to a
    * placeholder, so an empty value is always safe.
    */
   imageUrl: string;
+  /**
+   * A small JPEG data URL (~480px) carried INSIDE the Firestore document.
+   *
+   * This is how images cross between devices without Cloud Storage, which Firebase now
+   * puts behind the paid Blaze plan. A document caps at 1 MB; a 480px thumbnail is around
+   * 20-50 KB, so it fits with room to spare while the full-resolution copy stays on the
+   * device that captured it.
+   */
+  imageThumb: string;
   timestamp: number;
   languageUsed: string;
   weatherCondition: string;
@@ -54,8 +63,8 @@ export const saveScan = (s: Scan) => db.scans.put(s);
  * Untrusted-record handling
  *
  * Rows do not only come from this device. subscribeToScans() mirrors documents
- * written by other clients — a different Android build, an older schema, the
- * diagnostic script — and those cannot be assumed to carry every field. A missing
+ * written by other clients - a different Android build, an older schema, the
+ * diagnostic script - and those cannot be assumed to carry every field. A missing
  * number used to reach the UI as `undefined` and take the page down on `.toFixed()`.
  *
  * So the Scan contract is enforced once, here at the boundary, rather than with a
@@ -70,7 +79,7 @@ const TEXT_FIELDS = [
   // Rows written before image sync existed have no imageUrl at all. Listing it here
   // makes healLocalScans() backfill them with '' rather than leaving undefined to reach
   // an <img src>, which renders a broken-image icon.
-  'imageUrl',
+  'imageUrl', 'imageThumb',
 ] as const;
 
 const num = (v: unknown): number => (typeof v === 'number' && Number.isFinite(v) ? v : 0);
@@ -84,7 +93,7 @@ export function isCompleteScan(s: Partial<Scan>): boolean {
 
 /**
  * Coerce an arbitrary record into a complete Scan. A partial document degrades to
- * zeros and empty strings — visibly incomplete, but never a crash.
+ * zeros and empty strings - visibly incomplete, but never a crash.
  *
  * `imageDataUrl` is passed in rather than read from `raw` because cloud copies never
  * carry the image; the caller supplies whatever this device already holds.
@@ -109,6 +118,7 @@ export function normalizeScan(
     aiAdvisory: str(raw.aiAdvisory),
     imageDataUrl,
     imageUrl: str(raw.imageUrl),
+    imageThumb: str(raw.imageThumb),
     timestamp: num(raw.timestamp) || Date.now(),
     languageUsed: str(raw.languageUsed) || 'en',
     weatherCondition: str(raw.weatherCondition),

@@ -24,7 +24,7 @@ export function Sidebar({ collapsed, onToggleCollapsed, mobileOpen, onCloseMobil
 
   return (
     <>
-      {/* Scrim — mobile only; on desktop the sidebar is permanent, not an overlay */}
+      {/* Scrim - mobile only; on desktop the sidebar is permanent, not an overlay */}
       {mobileOpen && (
         <div className="fixed inset-0 z-40 animate-fade-in bg-black/50 lg:hidden" onClick={onCloseMobile} aria-hidden />
       )}

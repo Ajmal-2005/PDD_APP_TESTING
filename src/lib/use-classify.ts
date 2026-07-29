@@ -46,7 +46,7 @@ export function useClassify() {
   useEffect(() => {
     let cancelled = false;
     (async () => {
-      // In-browser model first — it warms the graph so the first Analyse is instant.
+      // In-browser model first - it warms the graph so the first Analyse is instant.
       try {
         await loadModel();
         if (!cancelled) setModelState('ready');
@@ -94,8 +94,10 @@ export function useClassify() {
           prevention: (PREVENTION[result.disease] ?? []).join('\n'),
           aiAdvisory: t(forecast.advisoryKey),
           imageDataUrl: thumb,
-          // Filled in by syncScan() once the upload to Firebase Storage completes.
+          // Both filled in by syncScan(): imageThumb is the ~480px copy that travels
+          // inside the Firestore document, imageUrl only if Cloud Storage is ever enabled.
           imageUrl: '',
+          imageThumb: '',
           timestamp: Date.now(),
           languageUsed: locale,
           // Empty, not 'Clear'. The old default fabricated a plausible reading that was

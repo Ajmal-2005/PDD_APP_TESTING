@@ -59,7 +59,7 @@ export default function ReportsPage() {
   }
 
   function exportPdf() {
-    // One full report per scan — the same layout as the single-scan download.
+    // One full report per scan - the same layout as the single-scan download.
     chosen.slice(0, 20).forEach((s, i) =>
       setTimeout(() => {
         try { generateReport(s); }

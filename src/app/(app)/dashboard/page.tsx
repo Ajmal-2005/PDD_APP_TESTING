@@ -172,7 +172,7 @@ export default function DashboardPage() {
                       <Tr key={s.id} onClick={() => router.push(`/history/${s.id}`)}>
                         <Td>
                           <div className="flex items-center gap-3">
-                            <ScanThumb src={s.imageDataUrl} remoteSrc={s.imageUrl} className="h-9 w-9 shrink-0 rounded-lg border border-line object-cover" iconSize={15} />
+                            <ScanThumb src={s.imageDataUrl} remoteSrc={s.imageThumb || s.imageUrl} className="h-9 w-9 shrink-0 rounded-lg border border-line object-cover" iconSize={15} />
                             <span className="truncate font-medium text-ink">{diseaseName(s)}</span>
                           </div>
                         </Td>

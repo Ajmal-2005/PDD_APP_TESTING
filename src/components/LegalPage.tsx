@@ -7,7 +7,7 @@ import { useApp } from '@/providers/AppProvider';
 
 export interface Section { heading: string; body: string }
 
-/** Public reading layout for privacy / terms — a centered document column with a
+/** Public reading layout for privacy / terms - a centered document column with a
  *  slim branded header, no app chrome (these are reachable before sign-in). */
 export function LegalPage({ title, sections, footer }: { title: string; sections: Section[]; footer?: string }) {
   const { t } = useApp();

@@ -73,7 +73,7 @@ export default function ProfilePage() {
                 <div className="mt-2 flex items-center gap-5">
                   <RadialGauge value={hasScans ? stats.ratio : 0} size={96} stroke={8} color={healthColor}>
                     <span className="text-[18px] font-semibold tnum text-ink">
-                      {hasScans ? `${(stats.ratio * 100).toFixed(0)}%` : '—'}
+                      {hasScans ? `${(stats.ratio * 100).toFixed(0)}%` : '-'}
                     </span>
                   </RadialGauge>
                   <div className="text-left">
@@ -125,7 +125,7 @@ export default function ProfilePage() {
                   {[[t('farmLabel'), farm.farmName], [t('region'), farm.farmLocation], [t('typeLabel'), farm.farmType]].map(([k, v]) => (
                     <div key={k} className="rounded-lg border border-line bg-panel-2/50 px-3.5 py-3">
                       <dt className="text-[11.5px] uppercase tracking-wide text-ink-3">{k}</dt>
-                      <dd className="mt-1 truncate text-[14px] font-medium text-ink">{v || '—'}</dd>
+                      <dd className="mt-1 truncate text-[14px] font-medium text-ink">{v || '-'}</dd>
                     </div>
                   ))}
                 </dl>

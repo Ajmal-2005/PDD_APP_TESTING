@@ -35,7 +35,7 @@ export default function SettingsPage() {
       <PageHeader title={t('navSettings')} subtitle={t('settingsSubtitle')} />
 
       <div className="grid grid-cols-12 gap-4 lg:gap-6">
-        {/* left nav — desktop settings pattern, not a flat scroll */}
+        {/* left nav - desktop settings pattern, not a flat scroll */}
         <aside className="col-span-12 lg:col-span-3">
           <nav className="flex gap-1 overflow-x-auto lg:flex-col lg:overflow-visible">
             {SECTIONS.map(({ id, key, icon: Icon }) => (
