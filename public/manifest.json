@@ -1,0 +1,14 @@
+{
+  "name": "AgroVision AI",
+  "short_name": "AgroVision",
+  "description": "Scan tomato leaves for instant disease diagnosis",
+  "start_url": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0A0F0D",
+  "theme_color": "#00C853",
+  "icons": [
+    { "src": "/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" },
+    { "src": "/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "maskable" }
+  ]
+}

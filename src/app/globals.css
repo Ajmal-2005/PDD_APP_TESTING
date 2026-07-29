@@ -1,0 +1,201 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ---------------------------------------------------------------------------
+   Design tokens.
+
+   Stored as space-separated RGB triplets so Tailwind's `/opacity` modifier
+   works against them (bg-panel/60, border-line/50, ...). Every surface,
+   ink and accent in the app resolves through these - no raw hex in components.
+   --------------------------------------------------------------------------- */
+
+:root {
+  color-scheme: light;
+
+  --bg:            247 248 247;   /* page plane            */
+  --panel:         255 255 255;   /* card / panel surface  */
+  --panel-2:       243 245 243;   /* inset wells, headers  */
+  --panel-3:       234 238 235;   /* hover fills           */
+  --line:          227 231 228;   /* hairline border       */
+  --line-strong:   208 215 210;
+
+  --ink:            13  18  16;   /* primary text          */
+  --ink-2:          75  86  81;   /* secondary text        */
+  --ink-3:         120 131 125;   /* muted / axis labels   */
+
+  --brand:           6 132  63;   /* AgroVision green, light-surface step */
+  --brand-hover:     5 112  53;
+  --brand-ink:     255 255 255;   /* text on brand         */
+  --brand-wash:    233 246 238;   /* tinted background     */
+
+  --risk-high:     206  44  49;
+  --risk-medium:   180  83   9;
+  --risk-low:       77 124  15;
+  --risk-safe:       6 132  63;
+
+  /* Categorical series - validated light steps (surface #FFFFFF) */
+  --series-1:        0 163  67;
+  --series-2:       37  99 235;
+  --series-3:      234  88  12;
+  --series-4:      124  58 237;
+  --series-5:      219  39 119;
+
+  /* Sequential green ramp, near-surface -> full */
+  --heat-0:        238 241 239;
+  --heat-1:        200 233 213;
+  --heat-2:        149 213 177;
+  --heat-3:         76 179 124;
+  --heat-4:          6 132  63;
+
+  --grid:          231 234 232;
+  --ring:            6 132  63;
+
+  --shadow-sm: 0 1px 2px rgb(13 18 16 / 0.05);
+  --shadow-md: 0 4px 16px -4px rgb(13 18 16 / 0.10), 0 1px 3px rgb(13 18 16 / 0.05);
+  --shadow-lg: 0 24px 48px -16px rgb(13 18 16 / 0.18), 0 2px 8px rgb(13 18 16 / 0.06);
+}
+
+.dark {
+  color-scheme: dark;
+
+  --bg:              9  12  11;
+  --panel:          20  25  23;
+  --panel-2:        26  32  29;
+  --panel-3:        35  43  39;
+  --line:           38  46  42;
+  --line-strong:    55  66  60;
+
+  --ink:           232 238 234;
+  --ink-2:         158 170 163;
+  --ink-3:         118 130 123;
+
+  --brand:          18 165  84;
+  --brand-hover:    38 189 104;
+  --brand-ink:       6  20  12;
+  --brand-wash:     18  38  27;
+
+  --risk-high:     229  72  77;
+  --risk-medium:   240 167  66;
+  --risk-low:      125 201  63;
+  --risk-safe:      18 165  84;
+
+  /* Categorical series - validated dark steps (surface #141917) */
+  --series-1:       18 165  84;
+  --series-2:       59 130 246;
+  --series-3:      219 106  21;
+  --series-4:      139 123 240;
+  --series-5:      221  95 151;
+
+  --heat-0:         28  34  31;
+  --heat-1:         22  84  58;
+  --heat-2:         15 122  70;
+  --heat-3:         18 165  84;
+  --heat-4:         58 222 135;
+
+  --grid:           34 41  37;
+  --ring:           18 165  84;
+
+  --shadow-sm: 0 1px 2px rgb(0 0 0 / 0.40);
+  --shadow-md: 0 4px 16px -4px rgb(0 0 0 / 0.50), 0 1px 3px rgb(0 0 0 / 0.30);
+  --shadow-lg: 0 24px 48px -16px rgb(0 0 0 / 0.65), 0 2px 8px rgb(0 0 0 / 0.40);
+}
+
+* { border-color: rgb(var(--line)); }
+
+html, body { height: 100%; }
+
+body {
+  @apply bg-bg text-ink antialiased;
+  font-feature-settings: 'cv02', 'cv03', 'cv04', 'ss01';
+  -webkit-tap-highlight-color: transparent;
+}
+
+::selection { background: rgb(var(--brand) / 0.22); }
+
+/* Focus: one consistent ring everywhere, keyboard-only. */
+:where(a, button, input, select, textarea, [tabindex]):focus-visible {
+  @apply outline-none ring-2 ring-brand/60 ring-offset-2 ring-offset-bg;
+}
+
+@layer components {
+  /*
+   * Panel: the single surface primitive the whole app is built from.
+   *
+   * 14px sits mid-range of the 12-16px card radius the design language calls for.
+   * Because every surface resolves through this one class, the step is felt across
+   * the whole app at once without a single layout changing.
+   *
+   * No hover lift here on purpose: most Panels are static containers, and making
+   * them react to the cursor implies a click target that isn't there. Cards that
+   * really are interactive (library entries, dashboard alerts, table rows) carry
+   * their own hover treatment at the call site.
+   */
+  .panel {
+    @apply rounded-[14px] border border-line bg-panel;
+    box-shadow: var(--shadow-sm);
+  }
+  .panel-flush { @apply rounded-[14px] border border-line bg-panel; }
+
+  .hairline { @apply border-line; }
+
+  /* Inputs */
+  /* 10px: one step inside the 14px card that usually contains it, so nested
+     corners stay concentric instead of fighting each other. */
+  .field {
+    @apply w-full rounded-[10px] border border-line bg-panel px-3 py-2.5 text-sm text-ink
+           outline-none transition placeholder:text-ink-3
+           hover:border-line-strong focus:border-brand focus:ring-2 focus:ring-brand/25;
+  }
+
+  .label { @apply block text-[13px] font-medium text-ink-2; }
+
+  /* Scrollbars: thin and recessive, matching the panel language. */
+  .scroll-thin { scrollbar-width: thin; scrollbar-color: rgb(var(--line-strong)) transparent; }
+  .scroll-thin::-webkit-scrollbar { width: 8px; height: 8px; }
+  .scroll-thin::-webkit-scrollbar-thumb {
+    @apply rounded-full border-[2px] border-solid border-transparent bg-line-strong bg-clip-content;
+  }
+  .scroll-thin::-webkit-scrollbar-track { background: transparent; }
+}
+
+@layer utilities {
+  /* Shared max width + gutters for every routed page. */
+  .shell-px { @apply px-5 lg:px-8 2xl:px-10; }
+  .tnum { font-variant-numeric: tabular-nums; }
+}
+
+/* Skeleton shimmer */
+@keyframes shimmer { 100% { transform: translateX(100%); } }
+.skeleton { @apply relative overflow-hidden rounded-md bg-panel-3; }
+.skeleton::after {
+  content: '';
+  @apply absolute inset-0 -translate-x-full;
+  background: linear-gradient(90deg, transparent, rgb(var(--ink) / 0.06), transparent);
+  animation: shimmer 1.6s infinite;
+}
+
+/* Ultra-fast Screen / Page Transition */
+@keyframes pageEnter {
+  0% {
+    opacity: 0;
+    transform: translate3d(0, 4px, 0);
+  }
+  100% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+.animate-page-enter {
+  animation: pageEnter 150ms cubic-bezier(0, 0, 0.2, 1) ease-out both;
+  will-change: transform, opacity;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .01ms !important;
+  }
+}

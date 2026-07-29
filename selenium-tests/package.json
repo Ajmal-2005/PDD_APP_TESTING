@@ -1,0 +1,13 @@
+{
+  "name": "agrovision-selenium-tests",
+  "version": "1.0.0",
+  "description": "Selenium E2E Automation Testing Suite for AgroVision Web Application",
+  "main": "tests/login-tests.js",
+  "scripts": {
+    "test": "node tests/login-tests.js",
+    "generate-report": "python generate_excel_report.py"
+  },
+  "dependencies": {
+    "selenium-webdriver": "^4.27.0"
+  }
+}

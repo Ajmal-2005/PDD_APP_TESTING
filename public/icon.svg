@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!-- Maskable: the green plate covers the full canvas, the leaf stays inside the
+       80% safe zone so Android's circle/squircle masks never clip it. -->
+  <rect width="512" height="512" fill="#00C853"/>
+  <path fill="none" stroke="#fff" stroke-width="24" stroke-linecap="round" stroke-linejoin="round"
+        d="M170 342c0-96 68-160 178-169 9 111-58 178-154 178h-24zM163 369c31-64 69-102 127-133"/>
+</svg>

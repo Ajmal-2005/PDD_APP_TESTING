@@ -1,0 +1,36 @@
+{
+  "name": "agrovision-web",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "@next/swc-win32-x64-msvc": "^16.2.12",
+    "@tensorflow/tfjs-backend-cpu": "4.9.0",
+    "@tensorflow/tfjs-backend-webgl": "4.9.0",
+    "@tensorflow/tfjs-converter": "^4.9.0",
+    "@tensorflow/tfjs-core": "4.9.0",
+    "@tensorflow/tfjs-tflite": "0.0.1-alpha.10",
+    "dexie": "^4.0.10",
+    "dexie-react-hooks": "^1.1.7",
+    "firebase": "^11.1.0",
+    "jspdf": "^2.5.2",
+    "lucide-react": "^0.469.0",
+    "next": "14.2.35",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "devDependencies": {
+    "@types/node": "^20",
+    "@types/react": "^18",
+    "@types/react-dom": "^18",
+    "autoprefixer": "^10.4.20",
+    "postcss": "^8.4.49",
+    "tailwindcss": "^3.4.17",
+    "typescript": "^5.7.2"
+  }
+}
