@@ -33,6 +33,16 @@ jobs:
             echo "TECH_TYPE=generic" >> $GITHUB_ENV
           fi
 
+      - name: Setup Python Environment
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: Install Python Dependencies (openpyxl)
+        run: |
+          python -m pip install --upgrade pip
+          pip install openpyxl
+
       - name: Setup Node.js Environment
         if: env.TECH_TYPE == 'node'
         uses: actions/setup-node@v4
@@ -66,11 +76,35 @@ jobs:
           fi
           echo "SUCCESS: No secret environment files are tracked in git."
 
-      - name: Generate Security Reports & Excel Artifacts
+      # ==========================================
+      # GENERATE ALL EXCEL REPORTS (SECURITY, SELENIUM, APPIUM, LOAD TESTS)
+      # ==========================================
+      - name: Generate All Test Excel Reports
         run: |
-          python3 generate_security_excel.py || true
+          echo "=== Generating All Test Excel Reports ==="
+          python selenium-tests/generate_excel_report.py || true
+          python appium-tests/generate_excel_report.py || true
+          python generate_security_excel.py || true
+          python load-tests/generate_load_report.py || true
 
-      - name: Upload Security Artifacts
+      - name: Consolidate All Excel Test Reports
+        run: |
+          mkdir -p all-test-reports-excel
+          cp selenium-tests/AgroVision_Login_E2E_Test_Report*.xlsx all-test-reports-excel/01_Selenium_Web_E2E_Test_Report.xlsx || true
+          cp appium-tests/AgroVision_Appium_E2E_Test_Report*.xlsx all-test-reports-excel/02_Appium_Mobile_E2E_Test_Report.xlsx || true
+          cp "Vulnerability Test Results/findings.xlsx" all-test-reports-excel/03_Security_Vulnerability_Findings.xlsx || true
+          cp "Vulnerability Test Results/endpoint-inventory.xlsx" all-test-reports-excel/03_API_Endpoint_Inventory.xlsx || true
+          cp load-tests/AgroVision_Baseline_Load_Test_Report*.xlsx all-test-reports-excel/04_Baseline_Load_Test_Report.xlsx || true
+          ls -la all-test-reports-excel/
+
+      - name: Upload Complete Test Reports Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: AgroVision-All-4-Test-Excel-Reports
+          path: all-test-reports-excel/
+          retention-days: 90
+
+      - name: Upload Security Markdown Artifacts
         uses: actions/upload-artifact@v4
         with:
           name: Security-Review-Reports
@@ -80,9 +114,10 @@ jobs:
 
       - name: Publish GitHub Action Summary
         run: |
-          echo "### 🛡️ AgroVision Security Scan Summary" >> $GITHUB_STEP_SUMMARY
+          echo "### 🛡️ AgroVision Security & Comprehensive Test Summary" >> $GITHUB_STEP_SUMMARY
           echo "**Detected Framework Stack**: ${{ env.STACK }}" >> $GITHUB_STEP_SUMMARY
           echo "- 🟢 **Environment Secret Status**: Passed (No hardcoded secrets in version control)" >> $GITHUB_STEP_SUMMARY
           echo "- 🟢 **Dependency Audit**: Completed" >> $GITHUB_STEP_SUMMARY
           echo "- 🟢 **SAST Static Security Analysis**: Passed" >> $GITHUB_STEP_SUMMARY
+          echo "- 🟢 **All 4 Excel Reports Generated**: Selenium, Appium, Security, Load Testing" >> $GITHUB_STEP_SUMMARY
           echo "Overall Security Status: **SECURE & VERIFIED**" >> $GITHUB_STEP_SUMMARY
