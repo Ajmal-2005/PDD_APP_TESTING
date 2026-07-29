@@ -11,25 +11,15 @@ const config: FirebaseOptions = {
   appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
 };
 
-/** True only when the web config is actually filled in. */
-export const firebaseReady = Boolean(config.apiKey && config.projectId);
+const isRealConfigValue = (val?: string) => Boolean(val && !val.includes('your_') && !val.includes('placeholder') && !val.includes('1234567890'));
+
+/** True only when real, non-placeholder Firebase web config is supplied. */
+export const firebaseReady = Boolean(isRealConfigValue(config.apiKey) && isRealConfigValue(config.projectId));
 
 let _app: FirebaseApp | null = null;
 let _auth: Auth | null = null;
 let _db: Firestore | null = null;
 
-/**
- * Everything below initializes lazily, on demand.
- *
- * Calling initializeApp() at module scope breaks `next build`: the App Router
- * executes client-component modules on the server while prerendering, so an unset
- * API key throws auth/invalid-api-key and every page fails to generate. Deferring
- * until first real use keeps the build green and lets the app run offline-only
- * when Firebase is not configured.
- *
- * The Firebase SDK modules (~250 KB combined) are also dynamically imported so
- * they don't bloat the initial JS bundle for every page.
- */
 async function app(): Promise<FirebaseApp | null> {
   if (!firebaseReady) return null;
   if (!_app) {
@@ -45,9 +35,6 @@ export async function getAuthInstance(): Promise<Auth | null> {
   if (!_auth) {
     const { getAuth, setPersistence, browserLocalPersistence } = await import('firebase/auth');
     _auth = getAuth(a);
-    // Persist the session in IndexedDB/localStorage so a signed-in user stays
-    // signed in across reloads and tabs. This is Firebase's web default, but we
-    // set it explicitly so the guarantee doesn't depend on an SDK default.
     void setPersistence(_auth, browserLocalPersistence).catch((e) =>
       console.warn('Could not set auth persistence', e),
     );
@@ -67,7 +54,6 @@ export async function getDb(): Promise<Firestore | null> {
 
 let _storage: import('firebase/storage').FirebaseStorage | null = null;
 
-/** Firebase Storage, for scan images. Same lazy pattern as auth and Firestore. */
 export async function getStorageInstance() {
   const a = await app();
   if (!a) return null;
@@ -78,9 +64,8 @@ export async function getStorageInstance() {
   return _storage;
 }
 
-/** For call sites that cannot proceed without auth. */
 export async function requireAuth(): Promise<Auth> {
   const a = await getAuthInstance();
-  if (!a) throw new Error('Firebase is not configured. Copy .env.local.example to .env.local and fill it in.');
+  if (!a) throw new Error('Firebase is not configured with real API keys in .env.local.');
   return a;
 }
