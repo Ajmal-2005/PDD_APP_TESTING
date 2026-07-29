@@ -37,7 +37,7 @@ jobs:
         if: env.TECH_TYPE == 'node'
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '22'
 
       - name: Run Gitleaks Secret Scanner
         uses: gitleaks/gitleaks-action@v2
