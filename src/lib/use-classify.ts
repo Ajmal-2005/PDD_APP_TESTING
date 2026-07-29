@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { classify, loadModel, type ClassificationResult } from './classifier';
+import { classify, loadModel, serverInferenceAvailable, type ClassificationResult } from './classifier';
 import { computeForecast } from './forecast';
 import { saveScan, type Scan } from './db';
 import { syncScan } from './sync';
@@ -45,14 +45,20 @@ export function useClassify() {
    */
   useEffect(() => {
     let cancelled = false;
-    loadModel().then(
-      () => { if (!cancelled) setModelState('ready'); },
-      (e) => {
-        if (cancelled) return;
-        console.error('[AgroVision] Model unavailable:', e);
-        setModelState('missing');
-      },
-    );
+    (async () => {
+      // In-browser model first — it warms the graph so the first Analyse is instant.
+      try {
+        await loadModel();
+        if (!cancelled) setModelState('ready');
+        return;
+      } catch (e) {
+        console.info('[AgroVision] No in-browser model, checking server inference.', e);
+      }
+      // No local model is not the end: /api/classify runs the same .tflite server-side.
+      // Only when that is unreachable too is scanning genuinely unavailable.
+      const ok = await serverInferenceAvailable();
+      if (!cancelled) setModelState(ok ? 'ready' : 'missing');
+    })();
     return () => { cancelled = true; };
   }, []);
 

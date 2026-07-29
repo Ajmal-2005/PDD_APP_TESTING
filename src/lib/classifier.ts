@@ -1,4 +1,5 @@
 import type * as tfTypes from '@tensorflow/tfjs-core';
+import { toDataUrl } from './utils';
 
 /**
  * TensorFlow.js is loaded lazily — the static `import type` above costs nothing
@@ -192,6 +193,49 @@ export async function loadModel(): Promise<Runnable> {
 export const isModelLoaded = () => labels.length > 0;
 
 /**
+ * Server-side inference, for when the browser cannot run the model itself.
+ *
+ * `agrovision_model.tflite` requires TFLite runtime >= 2.20 and the only published browser
+ * runtime is far older, so in-browser loading fails outright. `/api/classify` forwards to
+ * predict_server.py, which runs the identical file the Android app ships — same weights,
+ * same graph, same raw-0-255 preprocessing. The phone and the website therefore return the
+ * same prediction for the same photo.
+ *
+ * This is real inference, not a stand-in: the scores come from the model. If the service
+ * is unreachable this throws, and the scan page shows its "model not installed" banner —
+ * it must never invent a result, because callers persist, sync and print what they get.
+ */
+/** Is server-side inference reachable? Cheap probe — no image, no inference. */
+export async function serverInferenceAvailable(): Promise<boolean> {
+  try {
+    const res = await fetch('/api/classify', { cache: 'no-store' });
+    if (!res.ok) return false;
+    return Boolean((await res.json())?.available);
+  } catch {
+    return false;
+  }
+}
+
+async function classifyOnServer(dataUrl: string): Promise<number[]> {
+  const res = await fetch('/api/classify', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ image: dataUrl }),
+  });
+  if (!res.ok) {
+    const body = await res.json().catch(() => ({}));
+    throw new Error(body?.error ?? `inference request failed (${res.status})`);
+  }
+  const data = await res.json();
+  if (!Array.isArray(data?.scores) || !data.scores.length) {
+    throw new Error('inference service returned no scores');
+  }
+  // Adopt the server's label list so indices always line up with the scores it produced.
+  if (Array.isArray(data.labels) && data.labels.length) labels = data.labels.map(String);
+  return data.scores as number[];
+}
+
+/**
  * The model carries its own preprocessing (Rescaling 1/127.5, offset -1) inside the
  * graph, exactly as the Android build does — TFLiteClassifier.kt feeds raw 0-255 floats
  * into its ByteBuffer. So we feed raw 0-255 here too and must NOT normalize.
@@ -199,7 +243,29 @@ export const isModelLoaded = () => labels.length > 0;
 export async function classify(
   source: HTMLImageElement | HTMLCanvasElement | HTMLVideoElement,
 ): Promise<ClassificationResult> {
-  const [model, tf] = await Promise.all([loadModel(), getTf()]);
+  /*
+   * In-browser first, server second.
+   *
+   * A local model (the TF.js export the training notebook produces) is preferred: it needs
+   * no network and no second process. When none is installed — today's situation, since
+   * the Android .tflite cannot initialise in any published browser runtime — inference
+   * moves to /api/classify, which runs that same .tflite server-side.
+   *
+   * Both paths end at interpret(), so the argmax, the Not_Tomato gate, MIN_CONFIDENCE and
+   * the DRI are identical either way, and identical to Android.
+   */
+  let localModel: Runnable | null = null;
+  try {
+    localModel = await loadModel();
+  } catch (localErr) {
+    console.info('[AgroVision] No in-browser model; using server inference.', localErr);
+    // Re-encode at the model's own input size — sending a full-resolution photo would
+    // upload megabytes for an image the server immediately downsamples to 224x224.
+    return interpret(await classifyOnServer(toDataUrl(source, 640)));
+  }
+
+  const model = localModel;
+  const tf = await getTf();
 
   const input = tf.tidy(() => {
     const img = tf.browser.fromPixels(source);
